@@ -19,7 +19,7 @@ app.use(express.static('views'))
 const localnetworks = os.networkInterfaces().wlo1
 const isLocal = localnetworks && localnetworks[0].address === '192.168.0.176' || false
 
-const FILE_DIR = isLocal ? `/media/daniel/SSD 120GB/audiobook` : './static'
+const FILE_DIR = isLocal ? `/media/daniel/SSD 120GB/audiobook` : '/home/daniel/audiobook/static'
 
 app.use(express.static(FILE_DIR));
 
@@ -37,9 +37,7 @@ let _progress = null
 app.post('/progress', (req, res) => {
     const progress = {
         createdAt: Date.now(),
-        book: "Project Hail Mary",
-        chapter: "01.mp3",
-        progress: 1363.877
+        ...req.body,
     }
 
     _progress = progress
@@ -50,7 +48,11 @@ app.post('/progress', (req, res) => {
     })
 })
 
-app.get('/progress', (req, res) => {
+app.get('/progress/:book/:chapter', (req, res) => {
+    const {
+        book, chapter
+    } = req.params
+
     const progress = _progress
 
     res.json({
@@ -95,7 +97,7 @@ app.get('/books/:title', (req, res) => {
             let thumbnail = ''
             files.filter(file => {
                 const extension = file.split('.').pop()
-                if (extension === 'jpg') {
+                if (extension === 'jpg' || extension === 'jpeg') {
                     thumbnail = file
                 } else {
                     chapters.push(file)
