@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Dogeller</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+
+    <!-- <link href="https://vjs.zencdn.net/7.10.2/video-js.css" rel="stylesheet" /> -->
+</head>
+
+<body>
+    <div style='display:flex' id='container'>
+        <div class='container'>
+            <video oncontextmenu="return false;" class="video-js" width="100%" id="my-video" controls>
+                <source id='source' />
+            </video>
+            <div class="overlay">
+                <p id='title' style='color: white'></p>
+            </div>
+
+        </div>
+    </div>
+
+    <div style='display:flex' id='container'>
+
+        <div id='episodes' style='width: 100%;'>
+
+        </div>
+    </div>
+
+</body>
+<!-- <script src="https://vjs.zencdn.net/7.10.2/video.min.js"></script> -->
+<script>
+
+    getVideoDataAPI()
+
+    function getVideoDataAPI() {
+
+        fetch('http://localhost:3000/videoDatas')
+            .then(resp => resp.json())
+            .then(data => {
+
+
+                setUIEpisodes(data.videos)
+                let latestEpisode = Number(localStorage.getItem('latestEpisode'))
+                if (isNaN(latestEpisode)) {
+                    latestEpisode = 0
+                    localStorage.setItem(latestEpisode)
+                }
+
+                console.log(latestEpisode)
+
+                playVideo(data.videos[latestEpisode], latestEpisode)
+
+            })
+    }
+
+    function playVideo(video, i) {
+        const { fileName, title } = video
+
+        setUIVideoTitle(title)
+        setUIVideoSource(fileName)
+        localStorage.setItem('latestEpisode', i)
+
+    }
+
+    function setUIEpisodes(videos) {
+        console.log('setUIEpisodes', videos)
+        const episodesEl = document.getElementById('episodes')
+
+        videos.map((video, i) => {
+            const episodeEl = document.createElement('div')
+            episodeEl.innerHTML = video.title
+            episodeEl.setAttribute('class', 'episode')
+            episodeEl.setAttribute('videotitle', video.title)
+            episodeEl.addEventListener('click', () => playVideo(video, i))
+
+            const episodeThumbnailEl = document.createElement('img')
+            episodeThumbnailEl.src = 'https://miro.medium.com/max/3840/1*F-F_pytxhOLs64a18Fq6cw.jpeg'
+            episodeThumbnailEl.setAttribute('class', 'episode_thumbnail')
+
+            episodeEl.appendChild(episodeThumbnailEl)
+            episodesEl.appendChild(episodeEl)
+        })
+    }
+
+    function setUIVideoSource(fileName) {
+        const videoEl = document.getElementById('my-video')
+        const sourceEl = document.getElementById('source')
+
+        sourceEl.src = `http://localhost:3000/video?fileName=${fileName}`
+
+        videoEl.load()
+        videoEl.play()
+    }
+
+    function setUIVideoTitle(title) {
+        const titleEl = document.getElementById('title')
+        titleEl.innerHTML = title
+    }
+
+
+</script>
+<style>
+    p,
+    div {
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .container {
+        position: relative;
+    }
+
+    .container video {
+        position: relative;
+        z-index: 0;
+    }
+
+    .overlay 
+
+    .episode {
+        width: 100%;
+        height: 80px
+    }
+
+    .episode_thumbnail {
+        height: 50px
+    }
+</style>
+
+</html>
