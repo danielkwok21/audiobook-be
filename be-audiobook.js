@@ -33,14 +33,16 @@ app.get('/chapter/:book/:chapter', (req, res) => {
     res.sendFile(filePath)
 })
 
-let _progress = null
 app.post('/progress', (req, res) => {
-    const progress = {
-        createdAt: Date.now(),
-        ...req.body,
-    }
+    const {
+        progress,
+        chapter,
+        book
+    } = req.body
+    const q0 = `UPDATE Progress SET chapter = "${chapter}", progress = ${progres} WHERE book = "${book}"`
 
-    _progress = progress
+    const progresses = await database.query(q0)
+    const progress = progresses[0]
 
     res.json({
         status: 200,
@@ -48,12 +50,14 @@ app.post('/progress', (req, res) => {
     })
 })
 
-app.get('/progress/:book/:chapter', (req, res) => {
+app.get('/progress/:book/:chapter', async (req, res) => {
     const {
         book, chapter
     } = req.params
 
-    const progress = _progress
+    const q0 = `SELECT * FROM Progress WHERE book = "${book}" LIMIT 1`;
+    const progresses = await database.query(q0)
+    const progress = progresses[0]
 
     res.json({
         status: 200,
