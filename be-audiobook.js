@@ -33,20 +33,20 @@ app.get('/chapter/:book/:chapter', (req, res) => {
     res.sendFile(filePath)
 })
 
-app.post('/progress', (req, res) => {
+app.post('/progress', async (req, res) => {
     const {
         progress,
         chapter,
         book
     } = req.body
-    const q0 = `UPDATE Progress SET chapter = "${chapter}", progress = ${progres} WHERE book = "${book}"`
+    const q0 = `UPDATE Progress SET chapter = "${chapter}", progress = ${progress} WHERE book = "${book}"`
 
     const progresses = await database.query(q0)
-    const progress = progresses[0]
+    const _progress = progresses[0]
 
     res.json({
         status: 200,
-        progress
+        progress: _progress
     })
 })
 

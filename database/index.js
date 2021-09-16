@@ -5,7 +5,7 @@ const dbConnect = {
   host: "localhost",
   user: "root",
   password: "deltakilo21",
-  database: "audiobook"
+  database: "audiobook_be"
 }
 
 const pool = mysql.createPool(dbConnect);
