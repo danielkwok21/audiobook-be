@@ -13,7 +13,7 @@ const PORT = 5000
 app.use(cors())
 app.use(bodyParser())
 app.use(bodyParser.urlencoded({ extended: false }))
-app.set('view engine', 'ejs')
+app.set('trust proxy', 'loopback')
 app.use(express.static('views'))
 
 const localnetworks = os.networkInterfaces().wlo1
@@ -23,6 +23,21 @@ const FILE_DIR = isLocal ? `/media/daniel/SSD 120GB/audiobook` : '/home/daniel/a
 
 app.use(express.static(FILE_DIR));
 
+app.post('/fingerprint', async (req, res) => {
+    const {
+        width, height, userAgent
+    } = req.body
+
+    const ipAddress = req.ip
+
+    console.log({
+        width, height, userAgent, ipAddress
+    })
+
+    res.json({
+        width, height, userAgent, ipAddress
+    })
+})
 
 app.get('/chapter/:book/:chapter', (req, res) => {
     const {
