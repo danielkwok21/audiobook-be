@@ -54,18 +54,35 @@ app.post('/progress', async (req, res) => {
         chapter,
         book
     } = req.body
-    const q0 = `UPDATE Progress SET chapter = "${chapter}", progress = ${progress} WHERE book = "${book}"`
 
+    const q0 = `SELECT Progress WHERE book="${book}"`
     const progresses = await database.query(q0)
     const _progress = progresses[0]
 
+    if(_progress){
+        const q1 = `UPDATE Progress SET chapter = "${chapter}", progress = ${progress} WHERE book = "${book}"`
+        await database.query(q1)
+    }else{
+        const q2 = `INSERT INTO Progress (chapter, progress, book) VALUES ("${chapter}", ${progress}, "${book}")`
+        await database.query(q2)
+    }
+
     res.json({
         status: 200,
-        progress: _progress
     })
 })
 
-app.get('/progress/:book/:chapter', async (req, res) => {
+app.get('/progress', async (req, res) => {
+    const q0 = `SELECT * from Progress`;
+    const progresses = await database.query(q0)
+
+    res.json({
+        status: 200,
+        progresses,
+    })
+})
+
+app.get('/progress/:book/', async (req, res) => {
     const {
         book, chapter
     } = req.params
